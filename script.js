@@ -19,8 +19,23 @@ if (navigator.geolocation)
       console.log(
         `https://google.com/maps/place/Ningolai+Village,+Swat,+Khyber+Pakhtunkhwa,+Pakistan/@${latitude},${longitude}`
       );
+
+      const coords = [latitude, longitude];
+      const map = L.map('map').setView(coords, 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
     },
     function () {
       alert('Could not found your location');
     }
   );
+
+// console.log(name);
