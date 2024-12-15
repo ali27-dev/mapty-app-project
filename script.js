@@ -3,18 +3,11 @@
 // prettier-ignore
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-const form = document.querySelector('.form');
-const containerWorkouts = document.querySelector('.workouts');
-const inputType = document.querySelector('.form__input--type');
-const inputDistance = document.querySelector('.form__input--distance');
-const inputDuration = document.querySelector('.form__input--duration');
-const inputCadence = document.querySelector('.form__input--cadence');
-const inputElevation = document.querySelector('.form__input--elevation');
-
 class Workout {
   date = new Date();
   id = (Date.now() + '').slice(-10);
-  constructor(distance, duration, coords) {
+
+  constructor(coords, distance, duration) {
     this.distance = distance;
     this.duration = duration;
     this.coords = coords;
@@ -22,6 +15,7 @@ class Workout {
 }
 
 class Running extends Workout {
+  type = 'running';
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
     this.cadence = cadence;
@@ -35,6 +29,7 @@ class Running extends Workout {
 }
 
 class Cycling extends Workout {
+  type = 'cycling';
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
@@ -45,9 +40,19 @@ class Cycling extends Workout {
     return this.speed;
   }
 }
-const run1 = new Running([23, -67], 5.2, 24, 167);
-const cycling1 = new Cycling([23, -67], 5.2, 24, 167);
-console.log(run1, cycling1);
+// const run1 = new Running([23, -67], 5.2, 24, 167);
+// const cycling1 = new Cycling([23, -67], 5.2, 24, 167);
+// console.log(run1, cycling1);
+
+///////////////////////////////////////
+// APPLICATION ARCHITECTURE
+const form = document.querySelector('.form');
+const containerWorkouts = document.querySelector('.workouts');
+const inputType = document.querySelector('.form__input--type');
+const inputDistance = document.querySelector('.form__input--distance');
+const inputDuration = document.querySelector('.form__input--duration');
+const inputCadence = document.querySelector('.form__input--cadence');
+const inputElevation = document.querySelector('.form__input--elevation');
 
 class App {
   #map;
@@ -57,9 +62,10 @@ class App {
   constructor() {
     this._getPosition();
 
+    // attach wevent handlers
     form.addEventListener('submit', this._newWorkOut.bind(this));
 
-    inputType.addEventListener('change', this._toggleElevation);
+    inputType.addEventListener('change', this._toggleElevationFiled);
   }
 
   _getPosition() {
@@ -75,16 +81,16 @@ class App {
   _loadMap(position) {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
-    console.log(
-      `https://google.com/maps/place/Ningolai+Village,+Swat,+Khyber+Pakhtunkhwa,+Pakistan/@${latitude},${longitude}`
-    );
+    // console.log(
+    //   `https://google.com/maps/place/Ningolai+Village,+Swat,+Khyber+Pakhtunkhwa,+Pakistan/@${latitude},${longitude}`
+    // );
 
     const coords = [latitude, longitude];
 
     // console.log(this);
 
     this.#map = L.map('map').setView(coords, 11);
-    console.log(this.#map);
+    // console.log(this.#map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -100,20 +106,20 @@ class App {
     form.classList.remove('hidden');
     inputDistance.focus();
   }
-  _toggleElevation() {
+
+  _toggleElevationFiled() {
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
     inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
   }
 
   _newWorkOut(e) {
-    const validInput = (...inputs) => inputs.every(inp => Number.isFinite(inp));
-
-    const allPositiveNum = (...inputs) => inputs.every(inp => inp > 0);
-
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
     e.preventDefault();
 
     //Get data from Form
-    const type = +inputType.value;
+    const type = inputType.value;
     const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
@@ -128,33 +134,45 @@ class App {
         // !Number.isFinite(distance) ||
         // !Number.isFinite(duration) ||
         // !Number.isFinite(cadence)
-        !validInput(distance, duration, cadence) ||
-        !allPositiveNum(distance, duration, cadence)
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence)
       )
         return alert('Input have to be positive number!');
 
-      Workout = new Running([lat, lng], distance, duration, cadence);
+      workout = new Running([lat, lng], distance, duration, cadence);
     }
+
     // if workot cycling,create cycling object
     if (type === 'cycling') {
       const elevation = +inputElevation.value;
 
       if (
-        !validInput(distance, duration, elevation) ||
-        !allPositiveNum(distance, duration)
-      );
+        !validInputs(distance, duration, elevation) ||
+        !allPositive(distance, duration)
+      )
+        return alert('Input have to be positive number!');
 
-      return alert('Input have to be positive number!');
-
-      Workout = new Cycling([lat, lng], distance, duration, elevation);
+      workout = new Cycling([lat, lng], distance, duration, elevation);
     }
     // Add new object to workout array
     this.#workouts.push(workout);
-    console.log(workout);
+    // console.log(workout);
 
     // Render workout on map as marker
+    this.renderWorkoutMarker(workout);
 
-    L.marker([lat, lng])
+    // Render workout on list
+
+    // Hide form + clear input files
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+  }
+
+  renderWorkoutMarker(workout) {
+    L.marker(workout.coords)
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -162,22 +180,11 @@ class App {
           minWidth: 100,
           autoClose: false,
           closeOnClick: false,
-          className: 'running-popup',
+          className: `${workout.type}-popup`,
         })
       )
       .setPopupContent('workout')
       .openPopup();
-
-    // Render workout on list
-
-    // Hide form + clear input files
-
-    // clear input fields
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
   }
 }
 
