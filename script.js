@@ -101,9 +101,6 @@ class App {
   _loadMap(position) {
     const { latitude } = position.coords;
     const { longitude } = position.coords;
-    // console.log(
-    //   `https://google.com/maps/place/Ningolai+Village,+Swat,+Khyber+Pakhtunkhwa,+Pakistan/@${latitude},${longitude}`
-    // );
 
     const coords = [latitude, longitude];
 
@@ -129,6 +126,21 @@ class App {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
+  }
+
+  // Hide form + clear input files
+
+  _hideForm() {
+    // Empty inputs
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+
+    form.style.display = 'none';
+    form.classList.add('hidden');
+    setTimeout(() => (form.style.display = 'grid'), 1000);
   }
 
   _toggleElevationFiled() {
@@ -181,20 +193,14 @@ class App {
     }
     // Add new object to workout array
     this.#workouts.push(workout);
-    // console.log(workout);
 
     // Render workout on map as marker
     this._renderWorkoutMarker(workout);
 
     // Render workout on list
     this._renderWorkout(workout);
-
     // Hide form + clear input files
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    this._hideForm();
 
     // set local-storage to all workouts
     this._setLocalStorage();
