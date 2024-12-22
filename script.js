@@ -79,6 +79,7 @@ class App {
 
     // get data from  local-storage
     this._getLocalStorage();
+    this._render();
 
     // attach wevent handlers
     form.addEventListener('submit', this._newWorkOut.bind(this));
@@ -86,8 +87,14 @@ class App {
     inputType.addEventListener('change', this._toggleElevationFiled);
 
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-  }
 
+    // this._render();
+    const b11 = document.getElementById('reset_button');
+    b11.addEventListener('click', function () {
+      localStorage.removeItem('workouts');
+      location.reload();
+    });
+  }
   _getPosition() {
     if (navigator.geolocation)
       navigator.geolocation.getCurrentPosition(
@@ -310,9 +317,22 @@ class App {
     });
   }
 
+  _deleteWorkOut() {}
+
   reset() {
     localStorage.removeItem('workouts');
     location.reload();
+  }
+  _render() {
+    // Adding Reset Function
+    let html = `<div class="btn-center">
+    <button id="reset_button" class="button-primary">Clear All </button>
+    </div>`;
+    containerWorkouts.insertAdjacentHTML('afterend', html);
+    html = `<h5 class="errorMsg"></h5>`;
+    form.insertAdjacentHTML('beforeend', html);
+    html = `<h4>Modified By: Abid Ali</h4>`;
+    document.querySelector('.copyright').insertAdjacentHTML('afterend', html);
   }
 }
 
