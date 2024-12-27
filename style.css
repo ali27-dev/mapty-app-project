@@ -235,7 +235,7 @@ a:visited {
   margin: 10px;
   width: 50%;
   font-weight: bolder;
-  background: #00c56a;
+  background-color: #00c56a;
   border: 0px solid rgb(214, 222, 224);
   box-shadow: #2d3439;
   border-radius: 4px;
@@ -252,41 +252,14 @@ a:visited {
   color: var(--color-light--2);
 }
 
-/* .cross {
-  position: absolute;
-  top: 5px;
-  right: 15px;
-  font-size: 15px;
-  color: white;
-  z-index: 11;
-  padding: 5px;
+.btn-box {
+  margin-top: 8px;
 }
-
-.edit {
-  position: absolute;
-  top: 5px;
-  right: 35px;
-  font-size: 15px;
-  color: white;
-  z-index: 11;
-  padding: 5px;
+.delete-btn {
+  padding: 2px 4px;
+  background-color: var(--color-dark--2);
+  color: var(--color-light--2);
 }
-
-.errorMsg {
-  min-width: fit-content;
-
-  position: absolute;
-  bottom: 0px;
-  left: 20px;
-  display: inline-flex;
-  font-size: 1.5rem;
-  min-width: max-content;
-  padding: 2px;
-  text-decoration: none;
-  font-weight: normal;
-  color: rgb(255, 0, 0);
-  border-bottom: 2px solid rgba(207, 63, 63, 0.548);
-} */
 
 h4 {
   color: var(--color-light--1);

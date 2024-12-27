@@ -226,7 +226,10 @@ class App {
         })
       )
       .setPopupContent(
-        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}
+         <div class='btn-box'>
+          <button class="delete-btn" data-id="${workout.id}">❌ Delete</button>
+        </div>`
       )
       .openPopup();
   }
@@ -300,7 +303,6 @@ class App {
     // using the public interface
     // workout.click();
   }
-
   _setLocalStorage() {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
@@ -317,9 +319,7 @@ class App {
     });
   }
 
-  _deleteWorkOut() {}
-
-  reset() {
+  _reset() {
     localStorage.removeItem('workouts');
     location.reload();
   }
